@@ -1,6 +1,7 @@
 import { Banner } from "./components/Banner";
 import { BecomeMember } from "./components/BecomeMember";
 import { MeetTheTrainer } from "./components/MeetTheTrainer";
+import { Navbar } from "./components/Navbar";
 import { Testimonials } from "./components/Testimonials";
 
 const featureCards = [
@@ -40,6 +41,7 @@ const PersonIcon = () => {
 export default function Home() {
   return (
     <div className="h-full w-full">
+      <Navbar />
       <Banner />
       <BecomeMember />
 
