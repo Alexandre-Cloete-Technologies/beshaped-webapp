@@ -1,65 +1,83 @@
-import Image from "next/image";
+import { Banner } from "./components/Banner";
+import { BecomeMember } from "./components/BecomeMember";
+import { MeetTheTrainer } from "./components/MeetTheTrainer";
+import { Testimonials } from "./components/Testimonials";
+
+const featureCards = [
+  "Personalized Plan",
+  "Nutrition Guidance",
+  "Weekly Check-ins",
+  "Progress Tracking",
+];
+
+const programs = [
+  {
+    title: "Strength Foundation",
+    description: "Build strength and improve movement quality.",
+  },
+  {
+    title: "Lean & Tone",
+    description: "Lose fat while maintaining muscle and energy.",
+  },
+  {
+    title: "Performance Boost",
+    description: "Increase endurance, speed, and confidence.",
+  },
+  {
+    title: "Lifestyle Reset",
+    description: "Create simple, sustainable fitness habits.",
+  },
+];
+
+const PersonIcon = () => {
+  return (
+    <div className="mb-4 flex size-24 items-center justify-center rounded-full border-2 border-white">
+      <div className="size-10 rounded-full border-2 border-white" />
+    </div>
+  );
+};
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="h-full w-full">
+      <Banner />
+      <BecomeMember />
+
+      <section className="bg-zinc-900 px-6 py-16 text-center text-white md:py-24">
+        <h2 className="text-4xl font-bold">WHAT YOU GET</h2>
+        <div className="mx-auto mt-10 grid max-w-6xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {featureCards.map((item) => (
+            <article key={item} className="flex flex-col items-center">
+              <PersonIcon />
+              <h3 className="text-xl font-bold">{item}</h3>
+              <p className="mt-2 text-zinc-300">Get a plan that works for you</p>
+            </article>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section className="bg-white px-6 py-16 md:py-24">
+        <h2 className="text-center text-4xl font-bold text-green-600">The Programs</h2>
+        <p className="mt-2 text-center text-lg font-light text-zinc-700">
+          Choose from a variety of programs
+        </p>
+        <div className="mx-auto mt-10 grid max-w-6xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {programs.map((program) => (
+            <article key={program.title} className="text-center text-zinc-900">
+              <img
+                className="h-56 w-full rounded-lg object-cover"
+                src="https://images.unsplash.com/photo-1532635246-4b1f7a2f8d2e?q=80&w=1500&auto=format&fit=max"
+                alt={program.title}
+              />
+              <h3 className="mt-4 text-xl font-bold">{program.title}</h3>
+              <p className="mt-1 text-zinc-600">{program.description}</p>
+            </article>
+          ))}
         </div>
-      </main>
+      </section>
+
+      <Testimonials />
+      <MeetTheTrainer />
     </div>
   );
 }
