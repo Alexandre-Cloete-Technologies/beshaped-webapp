@@ -1,26 +1,27 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { PiArrowLeft } from "react-icons/pi";
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { auth } from "../../lib/firebase";
-const COMPANY_LOGO = "/vercel.svg";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSignIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = "/dashboard";
+      router.replace("/dashboard");
     } catch {
       setError("Invalid email or password. Please try again.");
     } finally {

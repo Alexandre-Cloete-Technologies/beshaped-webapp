@@ -1,6 +1,7 @@
 "use client";
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { auth } from "../../lib/firebase";
@@ -51,6 +52,21 @@ export default function DashboardPage() {
         <p className="mt-3 text-zinc-600">
           You are logged in{userEmail ? ` as ${userEmail}` : ""}.
         </p>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/programs"
+            className="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-stone-100"
+          >
+            Open Programs
+          </Link>
+          <Link
+            href="/exercises"
+            className="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-stone-100"
+          >
+            Open Exercises
+          </Link>
+        </div>
 
         <button
           type="button"
