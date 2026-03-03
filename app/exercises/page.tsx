@@ -8,6 +8,20 @@ import type { ExerciseCardProps } from "../components/ExerciseCard";
 import { ProtectedNavbar } from "../components/ProtectedNavbar";
 import { db } from "../../lib/firebase";
 
+const categories = [
+  "All",
+  "Chest",
+  "Back",
+  "Shoulders",
+  "Biceps",
+  "Triceps",
+  "Core",
+  "Quadriceps",
+  "Hamstrings",
+  "Glutes",
+  "Calves",
+];
+
 type ExerciseListItem = ExerciseCardProps;
 
 export default function ExercisesPage() {
@@ -84,31 +98,11 @@ export default function ExercisesPage() {
       const matchesSearch = !normalizedSearch || searchableText.includes(normalizedSearch);
       const matchesCategory =
         selectedCategory === "All" ||
-        exercise.primaryMuscles.toLowerCase() === selectedCategory.toLowerCase() ||
-        exercise.secondaryMuscles.some(
-          (muscle) => muscle.toLowerCase() === selectedCategory.toLowerCase(),
-        );
+        exercise.primaryMuscles.toLowerCase() === selectedCategory.toLowerCase();
 
       return matchesSearch && matchesCategory;
     });
   }, [exercises, searchTerm, selectedCategory]);
-
-  const categories = useMemo(() => {
-    const muscleGroups = new Set<string>();
-
-    exercises.forEach((exercise) => {
-      if (exercise.primaryMuscles && exercise.primaryMuscles !== "N/A") {
-        muscleGroups.add(exercise.primaryMuscles);
-      }
-      exercise.secondaryMuscles.forEach((muscle) => {
-        if (muscle && muscle !== "N/A") {
-          muscleGroups.add(muscle);
-        }
-      });
-    });
-
-    return ["All", ...Array.from(muscleGroups).sort((a, b) => a.localeCompare(b))];
-  }, [exercises]);
 
   return (
     <AuthGuard>
