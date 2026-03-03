@@ -3,13 +3,15 @@ import Link from "next/link";
 export type ExerciseCardProps = {
   id: string;
   name: string;
-  equipment: string;
+  primaryMuscles: string;
+  secondaryMuscles: string[];
 };
 
 export const ExerciseCard = ({
   id,
   name,
-  equipment,
+  primaryMuscles,
+  secondaryMuscles,
 }: ExerciseCardProps) => {
   return (
     <article className="group rounded-xl border border-stone-200 bg-stone-50 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
@@ -19,8 +21,13 @@ export const ExerciseCard = ({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className="rounded-md bg-white px-3 py-1 text-xs text-zinc-700">{equipment}</span>
+      <div className="mt-4 flex flex-col items-start gap-2">
+        <span className="rounded-md bg-white px-3 py-1 text-xs text-zinc-700">
+          Primary: {primaryMuscles}
+        </span>
+        <span className="rounded-md bg-white px-3 py-1 text-xs text-zinc-700">
+          Secondary: {secondaryMuscles.join(", ")}
+        </span>
       </div>
 
       <Link

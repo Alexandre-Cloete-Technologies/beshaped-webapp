@@ -1,35 +1,115 @@
+"use client";
+
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect, useMemo, useState } from "react";
 import { AuthGuard } from "../components/AuthGuard";
 import { ExerciseCard } from "../components/ExerciseCard";
 import type { ExerciseCardProps } from "../components/ExerciseCard";
 import { ProtectedNavbar } from "../components/ProtectedNavbar";
+import { db } from "../../lib/firebase";
 
-const exercises: ExerciseCardProps[] = [
-  {
-    id: "push-up",
-    name: "Push-up",
-    equipment: "Bodyweight",
-  },
-  {
-    id: "squat",
-    name: "Squat",
-    equipment: "Bodyweight",
-  },
-  {
-    id: "plank",
-    name: "Plank",
-    equipment: "Bodyweight",
-  },
-  {
-    id: "deadlift",
-    name: "Deadlift",
-    equipment: "Barbell",
-  },
-
-];
-
-const categories = ["All", "Strength", "Mobility", "Core", "Cardio"];
+type ExerciseListItem = ExerciseCardProps;
 
 export default function ExercisesPage() {
+  const [exercises, setExercises] = useState<ExerciseListItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        setIsLoading(true);
+        setErrorMessage("");
+
+        const snapshot = await getDocs(collection(db, "exercises"));
+        const mappedExercises: ExerciseListItem[] = snapshot.docs.map((docSnapshot) => {
+          const data = docSnapshot.data() as {
+            name?: string;
+            primaryMuscles?: string | string[];
+            secondaryMuscles?: string | string[];
+          };
+
+          const readPrimaryMuscle = (value: string | string[] | undefined) => {
+            if (Array.isArray(value) && value.length > 0) {
+              return value[0] ?? "N/A";
+            }
+            if (typeof value === "string" && value.trim().length > 0) {
+              return value;
+            }
+            return "N/A";
+          };
+
+          const readSecondaryMuscles = (value: string | string[] | undefined) => {
+            if (Array.isArray(value)) {
+              const filtered = value
+                .filter((muscle) => typeof muscle === "string")
+                .map((muscle) => muscle.trim())
+                .filter((muscle) => muscle.length > 0);
+              return filtered.length > 0 ? filtered : ["N/A"];
+            }
+            if (typeof value === "string" && value.trim().length > 0) {
+              return [value];
+            }
+            return ["N/A"];
+          };
+
+          return {
+            id: docSnapshot.id,
+            name: data.name?.trim() ? data.name : docSnapshot.id,
+            primaryMuscles: readPrimaryMuscle(data.primaryMuscles),
+            secondaryMuscles: readSecondaryMuscles(data.secondaryMuscles),
+          };
+        });
+
+        setExercises(mappedExercises);
+      } catch {
+        setErrorMessage("We couldn't load exercises right now. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchExercises();
+  }, []);
+
+  const filteredExercises = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return exercises.filter((exercise) => {
+      const searchableText =
+        `${exercise.name} ${exercise.primaryMuscles} ${exercise.secondaryMuscles.join(" ")}`.toLowerCase();
+
+      const matchesSearch = !normalizedSearch || searchableText.includes(normalizedSearch);
+      const matchesCategory =
+        selectedCategory === "All" ||
+        exercise.primaryMuscles.toLowerCase() === selectedCategory.toLowerCase() ||
+        exercise.secondaryMuscles.some(
+          (muscle) => muscle.toLowerCase() === selectedCategory.toLowerCase(),
+        );
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [exercises, searchTerm, selectedCategory]);
+
+  const categories = useMemo(() => {
+    const muscleGroups = new Set<string>();
+
+    exercises.forEach((exercise) => {
+      if (exercise.primaryMuscles && exercise.primaryMuscles !== "N/A") {
+        muscleGroups.add(exercise.primaryMuscles);
+      }
+      exercise.secondaryMuscles.forEach((muscle) => {
+        if (muscle && muscle !== "N/A") {
+          muscleGroups.add(muscle);
+        }
+      });
+    });
+
+    return ["All", ...Array.from(muscleGroups).sort((a, b) => a.localeCompare(b))];
+  }, [exercises]);
+
   return (
     <AuthGuard>
       <div className="min-h-screen bg-stone-100">
@@ -71,8 +151,9 @@ export default function ExercisesPage() {
                     <button
                       key={category}
                       type="button"
+                      onClick={() => setSelectedCategory(category)}
                       className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-                        category === "All"
+                        category === selectedCategory
                           ? "bg-beshaped-green text-white"
                           : "bg-white text-zinc-700 hover:bg-stone-100"
                       }`}
@@ -84,6 +165,8 @@ export default function ExercisesPage() {
                 <input
                   type="text"
                   placeholder="Search exercises..."
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
                   className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-500 md:max-w-xs"
                 />
               </div>
@@ -91,13 +174,29 @@ export default function ExercisesPage() {
 
             <section>
               <h2 className="mb-4 text-xl font-semibold text-zinc-900">Exercise List</h2>
+              {isLoading ? (
+                <p className="rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm text-zinc-600">
+                  Loading exercises...
+                </p>
+              ) : null}
+              {!isLoading && errorMessage ? (
+                <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {errorMessage}
+                </p>
+              ) : null}
+              {!isLoading && !errorMessage && filteredExercises.length === 0 ? (
+                <p className="rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm text-zinc-600">
+                  No exercises match your current filters.
+                </p>
+              ) : null}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {exercises.map((exercise) => (
+                {filteredExercises.map((exercise) => (
                   <ExerciseCard
                     key={exercise.id}
                     id={exercise.id}
                     name={exercise.name}
-                    equipment={exercise.equipment}
+                    primaryMuscles={exercise.primaryMuscles}
+                    secondaryMuscles={exercise.secondaryMuscles}
                   />
                 ))}
               </div>
