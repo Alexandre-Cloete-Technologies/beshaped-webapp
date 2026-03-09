@@ -1,0 +1,117 @@
+import Link from "next/link";
+import { FiInfo } from "react-icons/fi";
+
+export type ProgramExerciseCardData = {
+  id: string;
+  exerciseName: string;
+  muscleGroup: string;
+  targetReps: string;
+  targetSets: number;
+  description: string;
+};
+
+type ProgramExerciseCardProps = {
+  exercise: ProgramExerciseCardData;
+  exerciseIndex: number;
+  onViewDetails: (exercise: ProgramExerciseCardData) => void;
+};
+
+export const ProgramExerciseCard = ({
+  exercise,
+  exerciseIndex,
+  onViewDetails,
+}: ProgramExerciseCardProps) => {
+  return (
+    <article className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-stone-200 bg-stone-50 px-6 py-4">
+        <div className="flex items-center gap-3">
+          <span className="rounded-full bg-beshaped-green px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-white">
+            {exercise.muscleGroup}
+          </span>
+          <span className="text-xs font-medium uppercase tracking-[0.12em] text-zinc-400">
+            Exercise {exerciseIndex + 1}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => onViewDetails(exercise)}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-300 bg-white text-zinc-600 transition hover:bg-stone-100"
+          aria-label={`More information about ${exercise.exerciseName}`}
+        >
+          <FiInfo className="h-4 w-4" />
+        </button>
+      </div>
+
+      <div className="space-y-6 p-6">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-zinc-900">{exercise.exerciseName}</h2>
+            <p className="mt-2 max-w-2xl text-sm text-zinc-600">
+              {exercise.description || "View the planned sets and reps below for this exercise."}
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                Target reps
+              </p>
+              <p className="mt-2 text-lg font-semibold text-zinc-900">{exercise.targetReps}</p>
+            </div>
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                Target sets
+              </p>
+              <p className="mt-2 text-lg font-semibold text-zinc-900">{exercise.targetSets}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={`/exercises/${exercise.id}`}
+            className="inline-flex items-center rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-stone-100"
+          >
+            Open Exercise
+          </Link>
+          <button
+            type="button"
+            onClick={() => onViewDetails(exercise)}
+            className="inline-flex items-center rounded-md bg-beshaped-green px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            View Details
+          </button>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-stone-200">
+          <div className="min-w-[640px]">
+            <div className="grid grid-cols-[1fr_1fr_1fr_120px] bg-stone-50 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+              <div className="border-b border-stone-200 px-4 py-3">Set</div>
+              <div className="border-b border-l border-stone-200 px-4 py-3">Weight</div>
+              <div className="border-b border-l border-stone-200 px-4 py-3">Reps</div>
+              <div className="border-b border-l border-stone-200 px-4 py-3">Status</div>
+            </div>
+
+            {Array.from({ length: exercise.targetSets }).map((_, setIndex) => (
+              <div
+                key={`${exercise.id}-set-${setIndex}`}
+                className="grid grid-cols-[1fr_1fr_1fr_120px] text-sm"
+              >
+                <div className="border-b border-stone-200 px-4 py-3 text-zinc-700">
+                  Set {setIndex + 1}
+                </div>
+                <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-500">-</div>
+                <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-700">
+                  {exercise.targetReps}
+                </div>
+                <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-500">
+                  Planned
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+};
