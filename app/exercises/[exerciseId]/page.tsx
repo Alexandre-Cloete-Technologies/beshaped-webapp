@@ -1,6 +1,8 @@
+import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
 import { AuthGuard } from "../../components/AuthGuard";
 import { ProtectedNavbar } from "../../components/ProtectedNavbar";
+import { db } from "../../../lib/firebase";
 
 type ExerciseDetailPageProps = {
   params: Promise<{
@@ -8,15 +10,39 @@ type ExerciseDetailPageProps = {
   }>;
 };
 
-const titleFromSlug = (slug: string | undefined) =>
-  (slug ?? "exercise")
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+const readPrimaryMuscle = (value: string | string[] | undefined) => {
+  if (Array.isArray(value) && value.length > 0) return value[0] ?? "N/A";
+  if (typeof value === "string" && value.trim().length > 0) return value;
+  return "N/A";
+};
+
+const readSecondaryMuscles = (value: string | string[] | undefined) => {
+  if (Array.isArray(value)) {
+    const filtered = value
+      .filter((muscle) => typeof muscle === "string")
+      .map((muscle) => String(muscle).trim())
+      .filter((muscle) => muscle.length > 0);
+    return filtered.length > 0 ? filtered : ["N/A"];
+  }
+  if (typeof value === "string" && value.trim().length > 0) return [value];
+  return ["N/A"];
+};
 
 export default async function ExerciseDetailPage({ params }: ExerciseDetailPageProps) {
   const { exerciseId } = await params;
-  const exerciseTitle = titleFromSlug(exerciseId);
+
+  const docRef = doc(db, "exercises", exerciseId);
+  const docSnap = await getDoc(docRef);
+
+  const name = docSnap.exists()
+    ? (docSnap.data().name?.trim() ? docSnap.data().name : exerciseId)
+    : exerciseId;
+  const primaryMuscles = docSnap.exists()
+    ? readPrimaryMuscle(docSnap.data().primaryMuscles)
+    : "N/A";
+  const secondaryMuscles = docSnap.exists()
+    ? readSecondaryMuscles(docSnap.data().secondaryMuscles)
+    : ["N/A"];
 
   return (
     <AuthGuard>
@@ -24,9 +50,19 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
         <ProtectedNavbar />
         <main className="px-6 py-10">
           <div className="mx-auto max-w-4xl rounded-2xl border border-stone-200 bg-stone-50 p-8 shadow-sm">
-            <h1 className="text-3xl font-bold text-zinc-900">{exerciseTitle}</h1>
+            <h1 className="text-3xl font-bold text-zinc-900">{name}</h1>
+
+            <div className="mt-4 flex flex-col gap-1">
+              <p className="text-zinc-600">
+                <span className="font-medium">Primary muscle:</span> {primaryMuscles}
+              </p>
+              <p className="text-zinc-600">
+                <span className="font-medium">Secondary muscles:</span>{" "}
+                {secondaryMuscles.join(", ")}
+              </p>
+            </div>
+
             <p className="mt-4 text-zinc-600">
-              This is the detailed exercise page for <span className="font-semibold">{exerciseTitle}</span>.
               Add form tips, reps, sets, and progression rules here.
             </p>
 
