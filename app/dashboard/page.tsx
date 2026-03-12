@@ -1,17 +1,29 @@
+"use client";
+
 import Link from "next/link";
 import { AuthGuard } from "../components/AuthGuard";
 import { ProtectedNavbar } from "../components/ProtectedNavbar";
+import { useAuth } from "../../lib/hooks/useAuth";
 
 export default function DashboardPage() {
+  const [user] = useAuth();
+
+  const username =
+    user?.displayName?.trim() ||
+    (user?.email ? user.email.split("@")[0] : "") ||
+    "...";
+
   return (
     <AuthGuard>
       <div className="min-h-screen bg-stone-100">
         <ProtectedNavbar />
         <main className="mx-auto max-w-2xl px-6 py-10">
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-8 shadow-sm">
-            <h1 className="text-3xl font-bold text-zinc-900">Welcome to your dashboard</h1>
+            <h1 className="text-3xl font-bold text-zinc-900">
+              Welcome, {username}
+            </h1>
             <p className="mt-3 text-zinc-600">
-              Choose where you want to continue in your coaching portal.
+              This Members area is still under development.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">

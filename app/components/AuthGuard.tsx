@@ -1,10 +1,9 @@
 "use client";
 
-import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { auth } from "../../lib/firebase";
+import { useAuth } from "../../lib/hooks/useAuth";
 
 type AuthGuardProps = {
   children: ReactNode;
@@ -12,26 +11,15 @@ type AuthGuardProps = {
 
 export const AuthGuard = ({ children }: AuthGuardProps) => {
   const router = useRouter();
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, loading] = useAuth();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsCheckingAuth(false);
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [loading, user, router]);
 
-      if (!user) {
-        setIsAuthenticated(false);
-        router.replace("/login");
-        return;
-      }
-
-      setIsAuthenticated(true);
-    });
-
-    return () => unsubscribe();
-  }, [router]);
-
-  if (isCheckingAuth) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-stone-100 text-zinc-700">
         Checking your session...
@@ -39,7 +27,7 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return null;
   }
 

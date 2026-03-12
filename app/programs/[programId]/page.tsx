@@ -319,7 +319,7 @@ export default function ProgramDetailPage() {
                       <div>
                         <h1 className="text-3xl font-bold text-zinc-900">{program.name}</h1>
                         <p className="mt-2 max-w-3xl text-zinc-600">{program.description}</p>
-
+                        <button onClick={() => console.log(program)}>See program data</button>
                       </div>
                     </div>
 
@@ -405,7 +405,7 @@ export default function ProgramDetailPage() {
                 {!selectedWorkout?.isRestDay && selectedWorkout ? (
                   <section className="space-y-5">
                     <h2 className="text-xl font-semibold text-zinc-900">
-                      {selectedWorkout.title} · Exercises
+                      {selectedWorkout.title}
                     </h2>
                     {selectedWorkout.notes.length ? (
                       <div className="rounded-2xl border border-beshaped-green/30 bg-beshaped-green/10 p-5 shadow-sm">

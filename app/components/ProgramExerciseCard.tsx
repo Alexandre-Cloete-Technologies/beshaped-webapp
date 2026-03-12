@@ -86,10 +86,10 @@ export const ProgramExerciseCard = ({
         <div className="overflow-x-auto rounded-2xl border border-stone-200">
           <div className="min-w-[640px]">
             <div className="grid grid-cols-[1fr_1fr_1fr_120px] bg-stone-50 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-              <div className="border-b border-stone-200 px-4 py-3">Set</div>
-              <div className="border-b border-l border-stone-200 px-4 py-3">Weight</div>
+              <div className="border-b border-stone-200 px-4 py-3">Sets</div>
+              {/* <div className="border-b border-l border-stone-200 px-4 py-3">Weight</div> */}
               <div className="border-b border-l border-stone-200 px-4 py-3">Reps</div>
-              <div className="border-b border-l border-stone-200 px-4 py-3">Status</div>
+              {/* <div className="border-b border-l border-stone-200 px-4 py-3">Status</div> */}
             </div>
 
             {Array.from({ length: exercise.targetSets }).map((_, setIndex) => (
@@ -100,13 +100,13 @@ export const ProgramExerciseCard = ({
                 <div className="border-b border-stone-200 px-4 py-3 text-zinc-700">
                   Set {setIndex + 1}
                 </div>
-                <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-500">-</div>
+                {/* <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-500">-</div> */}
                 <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-700">
                   {exercise.targetReps}
                 </div>
-                <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-500">
+                {/* <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-500">
                   Planned
-                </div>
+                </div> */}
               </div>
             ))}
           </div>
