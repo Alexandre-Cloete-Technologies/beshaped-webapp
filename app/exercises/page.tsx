@@ -2,7 +2,6 @@
 
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
-import { AuthGuard } from "../components/AuthGuard";
 import { ExerciseCard } from "../components/ExerciseCard";
 import type { ExerciseCardProps } from "../components/ExerciseCard";
 import { ProtectedNavbar } from "../components/ProtectedNavbar";
@@ -105,8 +104,7 @@ export default function ExercisesPage() {
   }, [exercises, searchTerm, selectedCategory]);
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-stone-100">
         <ProtectedNavbar />
         <main className="px-6 py-10 ">
           <div className="mx-auto max-w-7xl space-y-8">
@@ -198,6 +196,5 @@ export default function ExercisesPage() {
           </div>
         </main>
       </div>
-    </AuthGuard>
   );
 }

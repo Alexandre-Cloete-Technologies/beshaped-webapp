@@ -1,6 +1,5 @@
 import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
-import { AuthGuard } from "../../components/AuthGuard";
 import { ProtectedNavbar } from "../../components/ProtectedNavbar";
 import { db } from "../../../lib/firebase";
 
@@ -45,8 +44,7 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
     : ["N/A"];
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-stone-100">
         <ProtectedNavbar />
         <main className="px-6 py-10">
           <div className="mx-auto max-w-4xl rounded-2xl border border-stone-200 bg-stone-50 p-8 shadow-sm">
@@ -83,6 +81,5 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
           </div>
         </main>
       </div>
-    </AuthGuard>
   );
 }

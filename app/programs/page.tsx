@@ -3,7 +3,6 @@
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AuthGuard } from "../components/AuthGuard";
 import { ProtectedNavbar } from "../components/ProtectedNavbar";
 import { db } from "../../lib/firebase";
 
@@ -52,8 +51,7 @@ export default function ProgramsPage() {
   }, []);
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-stone-100">
         <ProtectedNavbar />
         <main className="px-6 py-10">
           <div className="mx-auto max-w-5xl">
@@ -89,6 +87,5 @@ export default function ProgramsPage() {
           </div>
         </main>
       </div>
-    </AuthGuard>
   );
 }

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FiArrowLeft, FiCalendar, FiCheckCircle, FiMoon, FiX } from "react-icons/fi";
-import { AuthGuard } from "../../components/AuthGuard";
 import {
   ProgramExerciseCard,
   type ProgramExerciseCardData,
@@ -286,8 +285,7 @@ export default function ProgramDetailPage() {
   }, [selectedPhaseData]);
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-stone-100">
         <ProtectedNavbar />
         <main className="px-6 py-10">
           <div className="mx-auto max-w-7xl space-y-8">
@@ -522,6 +520,5 @@ export default function ProgramDetailPage() {
           </div>
         ) : null}
       </div>
-    </AuthGuard>
   );
 }
