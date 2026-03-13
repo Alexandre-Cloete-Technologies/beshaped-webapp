@@ -17,8 +17,8 @@ export const Testimonials = () => {
   return (
     <section className="bg-zinc-100 px-6 py-16">
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-center text-3xl font-bold text-zinc-900">
-          Testimonials
+        <h2 className="text-center text-3xl font-bold uppercase tracking-[0.2em] text-zinc-900">
+          Our Transformations
         </h2>
         <p className="mt-2 text-center text-zinc-600">
           Real results from real members.
