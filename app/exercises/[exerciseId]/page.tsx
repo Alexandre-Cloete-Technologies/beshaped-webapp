@@ -27,6 +27,28 @@ const readSecondaryMuscles = (value: string | string[] | undefined) => {
   return ["N/A"];
 };
 
+const readYoutubeUrl = (data: Record<string, unknown> | undefined) => {
+  if (!data || typeof data !== "object") return null;
+  const url =
+    data.videoUrl ?? data.youtubeUrl ?? data.youtubeLink ?? data.video ?? data.youtube;
+  if (typeof url === "string" && url.trim().length > 0) return url.trim();
+  return null;
+};
+
+const getYoutubeEmbedUrl = (url: string): string | null => {
+  try {
+    // youtube.com/watch?v=VIDEO_ID
+    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/);
+    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+    // youtu.be/VIDEO_ID
+    const shortMatch = url.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 export default async function ExerciseDetailPage({ params }: ExerciseDetailPageProps) {
   const { exerciseId } = await params;
 
@@ -42,6 +64,10 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
   const secondaryMuscles = docSnap.exists()
     ? readSecondaryMuscles(docSnap.data().secondaryMuscles)
     : ["N/A"];
+  const youtubeUrl = docSnap.exists()
+    ? readYoutubeUrl(docSnap.data() as Record<string, unknown>)
+    : null;
+  const embedUrl = youtubeUrl ? getYoutubeEmbedUrl(youtubeUrl) : null;
 
   return (
     <div className="min-h-screen bg-stone-100">
@@ -78,6 +104,21 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
                 View Programs
               </Link>
             </div>
+
+            {embedUrl ? (
+              <div className="mt-8 border-t border-stone-200 pt-8">
+                <h2 className="text-lg font-semibold text-zinc-900">Video tutorial</h2>
+                <div className="mt-4 aspect-video w-full overflow-hidden rounded-xl border border-stone-200">
+                  <iframe
+                    src={embedUrl}
+                    title="Exercise video tutorial"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="h-full w-full"
+                  />
+                </div>
+              </div>
+            ) : null}
           </div>
         </main>
       </div>
