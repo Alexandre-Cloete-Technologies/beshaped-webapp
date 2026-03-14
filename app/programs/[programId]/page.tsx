@@ -206,7 +206,8 @@ export default function ProgramDetailPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selectedPhase, setSelectedPhase] = useState<number>(1);
-  const [selectedDay, setSelectedDay] = useState<number>(1);
+  const [selectedWeek, setSelectedWeek] = useState<number>(1);
+  const [selectedDayInWeek, setSelectedDayInWeek] = useState<number>(1);
   const [selectedExerciseInfo, setSelectedExerciseInfo] = useState<ProgramExercise | null>(null);
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
 
@@ -249,10 +250,16 @@ export default function ProgramDetailPage() {
     return availablePhases.find((phase) => phase.phase === selectedPhase) ?? availablePhases[0];
   }, [availablePhases, selectedPhase]);
 
-  const availableDays = useMemo(
-    () => selectedPhaseData?.workouts.map((workout) => workout.day) ?? [],
-    [selectedPhaseData],
-  );
+  const availableWeeks = useMemo(() => {
+    if (!selectedPhaseData?.workouts.length) {
+      return [];
+    }
+    const maxDay = Math.max(...selectedPhaseData.workouts.map((w) => w.day));
+    const weekCount = Math.ceil(maxDay / 7);
+    return Array.from({ length: weekCount }, (_, i) => i + 1);
+  }, [selectedPhaseData]);
+
+  const selectedOverallDay = (selectedWeek - 1) * 7 + selectedDayInWeek;
 
   const selectedWorkout = useMemo(() => {
     if (!selectedPhaseData) {
@@ -260,11 +267,18 @@ export default function ProgramDetailPage() {
     }
 
     return (
-      selectedPhaseData.workouts.find((workout) => workout.day === selectedDay) ??
+      selectedPhaseData.workouts.find((workout) => workout.day === selectedOverallDay) ??
       selectedPhaseData.workouts[0] ??
       null
     );
-  }, [selectedDay, selectedPhaseData]);
+  }, [selectedOverallDay, selectedPhaseData]);
+
+  useEffect(() => {
+    if (selectedWorkout && selectedWorkout.day !== selectedOverallDay) {
+      setSelectedWeek(Math.ceil(selectedWorkout.day / 7));
+      setSelectedDayInWeek(((selectedWorkout.day - 1) % 7) + 1);
+    }
+  }, [selectedWorkout, selectedOverallDay]);
 
   useEffect(() => {
     if (availablePhases.length > 0) {
@@ -276,19 +290,18 @@ export default function ProgramDetailPage() {
   }, [availablePhases]);
 
   useEffect(() => {
-    if (selectedPhaseData?.workouts.length) {
-      setSelectedDay((current) => {
-        const nextDay = selectedPhaseData.workouts.find((workout) => workout.day === current);
-        return nextDay ? current : selectedPhaseData.workouts[0].day;
-      });
+    if (selectedPhaseData?.workouts.length && availableWeeks.length) {
+      const firstDay = selectedPhaseData.workouts[0].day;
+      setSelectedWeek(Math.ceil(firstDay / 7));
+      setSelectedDayInWeek(((firstDay - 1) % 7) + 1);
     }
-  }, [selectedPhaseData]);
+  }, [selectedPhaseData, availableWeeks]);
 
   return (
     <div className="min-h-screen bg-stone-100">
         <ProtectedNavbar />
-        <main className="px-6 py-10">
-          <div className="mx-auto max-w-7xl space-y-8">
+        <main className="px-6 py-2">
+          <div className="mx-auto max-w-7xl space-y-4">
             {isLoading ? (
               <div className="rounded-2xl border border-stone-200 bg-white p-6 text-sm text-zinc-600 shadow-sm">
                 Loading program...
@@ -317,76 +330,116 @@ export default function ProgramDetailPage() {
                       <div>
                         <h1 className="text-3xl font-bold text-zinc-900">{program.name}</h1>
                         <p className="mt-2 max-w-3xl text-zinc-600">{program.description}</p>
-                        <button onClick={() => console.log(program)}>See program data</button>
                       </div>
                     </div>
-
 
                   </div>
                 </section>
 
                 <section className="rounded-2xl border border-stone-200 bg-stone-50 p-5 shadow-sm">
-                  <p className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                    Phases
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    {availablePhases.map((phase) => (
-                      <button
-                        key={phase.phase}
-                        type="button"
-                        onClick={() => setSelectedPhase(phase.phase)}
-                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                          phase.phase === selectedPhase
-                            ? "border-beshaped-green bg-beshaped-green text-white"
-                            : "border-stone-300 bg-white text-zinc-700 hover:bg-stone-100"
-                        }`}
-                      >
-                        Phase {phase.phase}
-                      </button>
-                    ))}
-                  </div>
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+                    <div className="flex-1">
+                      <p className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                        Phases
+                      </p>
+                      <div className="flex flex-wrap gap-3">
+                        {availablePhases.map((phase) => (
+                          <button
+                            key={phase.phase}
+                            type="button"
+                            onClick={() => setSelectedPhase(phase.phase)}
+                            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                              phase.phase === selectedPhase
+                                ? "border-beshaped-green bg-beshaped-green text-white"
+                                : "border-stone-300 bg-white text-zinc-700 hover:bg-stone-100"
+                            }`}
+                          >
+                            Phase {phase.phase}
+                          </button>
+                        ))}
+                      </div>
 
-                  <details className="mt-5 rounded-xl border border-stone-200 bg-white" open>
-                    <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-zinc-900">
-                      Phase information
-                    </summary>
-                    <div className="border-t border-stone-200 px-4 py-4 text-sm text-zinc-600">
-                      {selectedPhaseData?.information.length ? (
-                        <div className="space-y-2">
-                          {selectedPhaseData.information.map((item) => (
-                            <p key={item}>• {item}</p>
-                          ))}
+                      <details className="mt-5 rounded-xl border border-stone-200 bg-white" open>
+                        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-zinc-900">
+                          Phase information
+                        </summary>
+                        <div className="border-t border-stone-200 px-4 py-4 text-sm text-zinc-600">
+                          {selectedPhaseData?.information.length ? (
+                            <div className="space-y-2">
+                              {selectedPhaseData.information.map((item) => (
+                                <p key={item}>• {item}</p>
+                              ))}
+                            </div>
+                          ) : (
+                            <p>No extra phase information is available yet.</p>
+                          )}
                         </div>
-                      ) : (
-                        <p>No extra phase information is available yet.</p>
-                      )}
+                      </details>
                     </div>
-                  </details>
-                </section>
 
-                {availableDays.length > 1 ? (
-                  <section className="rounded-2xl border border-stone-200 bg-stone-50 p-5 shadow-sm">
-                    <p className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                      Days
-                    </p>
-                    <div className="flex flex-wrap gap-3">
-                      {availableDays.map((day) => (
-                        <button
-                          key={day}
-                          type="button"
-                          onClick={() => setSelectedDay(day)}
-                          className={`min-w-24 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                            day === selectedDay
-                              ? "border-beshaped-green bg-beshaped-green text-white"
-                              : "border-stone-300 bg-white text-zinc-700 hover:bg-stone-100"
-                          }`}
-                        >
-                          Day {day}
-                        </button>
-                      ))}
-                    </div>
-                  </section>
-                ) : null}
+                    {availableWeeks.length > 0 ? (
+                      <div className="lg:min-w-64 lg:border-l lg:border-stone-200 lg:pl-8">
+                        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                          Weeks & Days
+                        </p>
+                        <div className="space-y-4">
+                          <div>
+                            <p className="mb-2 text-xs font-medium text-zinc-600">Week</p>
+                            <div className="flex flex-wrap gap-2">
+                              {availableWeeks.map((week) => (
+                                <button
+                                  key={week}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedWeek(week);
+                                    setSelectedDayInWeek(1);
+                                  }}
+                                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                                    week === selectedWeek
+                                      ? "border-beshaped-green bg-beshaped-green text-white"
+                                      : "border-stone-300 bg-white text-zinc-700 hover:bg-stone-100"
+                                  }`}
+                                >
+                                  Week {week}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="mb-2 text-xs font-medium text-zinc-600">
+                              Day (Week {selectedWeek})
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {[1, 2, 3, 4, 5, 6, 7].map((dayInWeek) => {
+                                const overallDay = (selectedWeek - 1) * 7 + dayInWeek;
+                                const hasWorkout = selectedPhaseData?.workouts.some(
+                                  (w) => w.day === overallDay
+                                );
+                                return (
+                                  <button
+                                    key={dayInWeek}
+                                    type="button"
+                                    onClick={() => setSelectedDayInWeek(dayInWeek)}
+                                    disabled={!hasWorkout}
+                                    className={`min-w-14 rounded-xl border px-3 py-2 text-sm font-semibold transition ${
+                                      dayInWeek === selectedDayInWeek
+                                        ? "border-beshaped-green bg-beshaped-green text-white"
+                                        : hasWorkout
+                                          ? "border-stone-300 bg-white text-zinc-700 hover:bg-stone-100"
+                                          : "cursor-not-allowed border-stone-200 bg-stone-100 text-zinc-400"
+                                    }`}
+                                  >
+                                    Day {dayInWeek}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </section>
 
                 {selectedWorkout?.isRestDay ? (
                   <section className="rounded-2xl border border-stone-200 bg-white p-10 text-center shadow-sm">
@@ -421,7 +474,7 @@ export default function ProgramDetailPage() {
 
                     {selectedWorkout.exercises.length > 0 ? (
                       selectedWorkout.exercises.map((exercise, exerciseIndex) => {
-                        const exerciseKey = `${selectedPhase}-${selectedWorkout.day}-${exerciseIndex}-${exercise.id || "ex"}`;
+                        const exerciseKey = `${selectedPhase}-${selectedOverallDay}-${exerciseIndex}-${exercise.id || "ex"}`;
 
                         return (
                           <ProgramExerciseCard

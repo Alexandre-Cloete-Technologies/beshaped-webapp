@@ -28,9 +28,7 @@ export const ProgramExerciseCard = ({
           <span className="rounded-full bg-beshaped-green px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-white">
             {exercise.muscleGroup}
           </span>
-          <span className="text-xs font-medium uppercase tracking-[0.12em] text-zinc-400">
-            Exercise {exerciseIndex + 1}
-          </span>
+
         </div>
         <button
           type="button"
@@ -42,7 +40,7 @@ export const ProgramExerciseCard = ({
         </button>
       </div>
 
-      <div className="space-y-6 p-6">
+      <div className="space-y-3 p-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-zinc-900">{exercise.exerciseName}</h2>
@@ -83,33 +81,25 @@ export const ProgramExerciseCard = ({
           </button>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-stone-200">
-          <div className="min-w-[640px]">
-            <div className="grid grid-cols-[1fr_1fr_1fr_120px] bg-stone-50 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-              <div className="border-b border-stone-200 px-4 py-3">Sets</div>
-              {/* <div className="border-b border-l border-stone-200 px-4 py-3">Weight</div> */}
-              <div className="border-b border-l border-stone-200 px-4 py-3">Reps</div>
-              {/* <div className="border-b border-l border-stone-200 px-4 py-3">Status</div> */}
-            </div>
-
-            {Array.from({ length: exercise.targetSets }).map((_, setIndex) => (
-              <div
-                key={`${exercise.id}-set-${setIndex}`}
-                className="grid grid-cols-[1fr_1fr_1fr_120px] text-sm"
-              >
-                <div className="border-b border-stone-200 px-4 py-3 text-zinc-700">
-                  Set {setIndex + 1}
-                </div>
-                {/* <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-500">-</div> */}
-                <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-700">
-                  {exercise.targetReps}
-                </div>
-                {/* <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-500">
-                  Planned
-                </div> */}
-              </div>
-            ))}
+        <div className="rounded-2xl border border-stone-200">
+          <div className="grid grid-cols-2 bg-stone-50 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+            <div className="border-b border-stone-200 px-4 py-3">Sets</div>
+            <div className="border-b border-l border-stone-200 px-4 py-3">Reps</div>
           </div>
+
+          {Array.from({ length: exercise.targetSets }).map((_, setIndex) => (
+            <div
+              key={`${exercise.id}-set-${setIndex}`}
+              className="grid grid-cols-2 text-sm"
+            >
+              <div className="border-b border-stone-200 px-4 py-3 text-zinc-700">
+                Set {setIndex + 1}
+              </div>
+              <div className="border-b border-l border-stone-200 px-4 py-3 text-zinc-700">
+                {exercise.targetReps}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </article>
