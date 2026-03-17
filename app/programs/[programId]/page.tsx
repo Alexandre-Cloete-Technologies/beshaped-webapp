@@ -87,6 +87,44 @@ const readPrimaryMuscles = (value: unknown) => {
   return readString(value) || "General";
 };
 
+const readPrimaryMuscle = (value: string | string[] | undefined) => {
+  if (Array.isArray(value) && value.length > 0) return value[0] ?? "N/A";
+  if (typeof value === "string" && value.trim().length > 0) return value;
+  return "N/A";
+};
+
+const readSecondaryMuscles = (value: string | string[] | undefined) => {
+  if (Array.isArray(value)) {
+    const filtered = value
+      .filter((muscle) => typeof muscle === "string")
+      .map((muscle) => String(muscle).trim())
+      .filter((muscle) => muscle.length > 0);
+    return filtered.length > 0 ? filtered : ["N/A"];
+  }
+  if (typeof value === "string" && value.trim().length > 0) return [value];
+  return ["N/A"];
+};
+
+const readYoutubeUrl = (data: Record<string, unknown> | undefined) => {
+  if (!data || typeof data !== "object") return null;
+  const url =
+    data.videoUrl ?? data.youtubeUrl ?? data.youtubeLink ?? data.video ?? data.youtube;
+  if (typeof url === "string" && url.trim().length > 0) return url.trim();
+  return null;
+};
+
+const getYoutubeEmbedUrl = (url: string): string | null => {
+  try {
+    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/);
+    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+    const shortMatch = url.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 const normalizeExercise = (value: unknown, index: number): ProgramExercise | null => {
   if (!isRecord(value)) {
     return null;
@@ -211,6 +249,56 @@ export default function ProgramDetailPage() {
   const [selectedDayInWeek, setSelectedDayInWeek] = useState<number>(1);
   const [selectedExerciseInfo, setSelectedExerciseInfo] = useState<ProgramExercise | null>(null);
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
+  const [modalExerciseDetail, setModalExerciseDetail] = useState<{
+    name: string;
+    primaryMuscles: string;
+    secondaryMuscles: string[];
+    embedUrl: string | null;
+  } | null>(null);
+  const [modalExerciseLoading, setModalExerciseLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selectedExerciseInfo?.id || !isInfoModalVisible) {
+      setModalExerciseDetail(null);
+      return;
+    }
+
+    const fetchExerciseDetail = async () => {
+      setModalExerciseLoading(true);
+      setModalExerciseDetail(null);
+      try {
+        const snapshot = await getDoc(doc(db, "exercises", selectedExerciseInfo.id));
+        if (!snapshot.exists()) {
+          setModalExerciseDetail({
+            name: selectedExerciseInfo.exerciseName,
+            primaryMuscles: selectedExerciseInfo.musclesInvolved,
+            secondaryMuscles: ["N/A"],
+            embedUrl: null,
+          });
+          return;
+        }
+        const data = snapshot.data();
+        const youtubeUrl = readYoutubeUrl(data as Record<string, unknown>);
+        setModalExerciseDetail({
+          name: (typeof data.name === "string" && data.name.trim() ? data.name : selectedExerciseInfo.exerciseName) as string,
+          primaryMuscles: readPrimaryMuscle(data.primaryMuscles),
+          secondaryMuscles: readSecondaryMuscles(data.secondaryMuscles),
+          embedUrl: youtubeUrl ? getYoutubeEmbedUrl(youtubeUrl) : null,
+        });
+      } catch {
+        setModalExerciseDetail({
+          name: selectedExerciseInfo.exerciseName,
+          primaryMuscles: selectedExerciseInfo.musclesInvolved,
+          secondaryMuscles: ["N/A"],
+          embedUrl: null,
+        });
+      } finally {
+        setModalExerciseLoading(false);
+      }
+    };
+
+    void fetchExerciseDetail();
+  }, [selectedExerciseInfo?.id, selectedExerciseInfo?.exerciseName, selectedExerciseInfo?.musclesInvolved, isInfoModalVisible]);
 
   useEffect(() => {
     if (!programId) {
@@ -517,58 +605,128 @@ export default function ProgramDetailPage() {
         </main>
 
         {isInfoModalVisible && selectedExerciseInfo ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="max-h-[85vh] w-full max-w-2xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl">
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => {
+              setInfoModalVisible(false);
+              setSelectedExerciseInfo(null);
+              setModalExerciseDetail(null);
+            }}
+          >
+            <div
+              className="max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-start justify-between border-b border-stone-200 px-6 py-5">
-                <div>
-                  <h2 className="text-2xl font-semibold text-zinc-900">
-                    {selectedExerciseInfo.exerciseName}
-                  </h2>
-                  <p className="mt-1 text-sm text-zinc-500">
-                    Target muscle: {selectedExerciseInfo.musclesInvolved}
-                  </p>
-                </div>
+                <h2 className="text-xl font-semibold text-zinc-900">Exercise details</h2>
                 <button
                   type="button"
                   onClick={() => {
                     setInfoModalVisible(false);
                     setSelectedExerciseInfo(null);
+                    setModalExerciseDetail(null);
                   }}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-300 text-zinc-600 transition hover:bg-stone-100"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-stone-300 text-zinc-600 transition hover:bg-stone-100"
                   aria-label="Close exercise info"
                 >
                   <FiX className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="space-y-5 overflow-y-auto px-6 py-5">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                    Exercise details
-                  </p>
-                  <p className="mt-2 text-zinc-700">
-                    {selectedExerciseInfo.description || "No extra exercise information is available yet."}
-                  </p>
-                </div>
+              <div className="overflow-y-auto px-6 py-6">
+                {modalExerciseLoading ? (
+                  <div className="flex items-center justify-center py-16 text-zinc-500">
+                    Loading exercise...
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+                    <div className="flex-1 min-w-0 space-y-5">
+                      <div>
+                        <h3 className="text-2xl font-bold text-zinc-900">
+                          {modalExerciseDetail?.name ?? selectedExerciseInfo.exerciseName}
+                        </h3>
+                        <div className="mt-3 flex flex-col gap-1">
+                          <p className="text-zinc-600">
+                            <span className="font-medium">Primary muscle:</span>{" "}
+                            {modalExerciseDetail?.primaryMuscles ?? selectedExerciseInfo.musclesInvolved}
+                          </p>
+                          <p className="text-zinc-600">
+                            <span className="font-medium">Secondary muscles:</span>{" "}
+                            {modalExerciseDetail?.secondaryMuscles?.join(", ") ?? "N/A"}
+                          </p>
+                        </div>
+                      </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                      Target reps
-                    </p>
-                    <p className="mt-2 text-lg font-semibold text-zinc-900">
-                      {selectedExerciseInfo.targetReps}
-                    </p>
+                      <p className="text-zinc-600">
+                        {selectedExerciseInfo.description ||
+                          "Add form tips, reps, sets, and progression rules here."}
+                      </p>
+
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                            Target reps
+                          </p>
+                          <p className="mt-2 text-lg font-semibold text-zinc-900">
+                            {selectedExerciseInfo.targetReps}
+                          </p>
+                        </div>
+                        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                            Target sets
+                          </p>
+                          <p className="mt-2 text-lg font-semibold text-zinc-900">
+                            {selectedExerciseInfo.targetSets}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-3">
+                        <Link
+                          href={`/exercises/${selectedExerciseInfo.id}`}
+                          className="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-stone-100"
+                        >
+                          Open Exercise Page
+                        </Link>
+                        <Link
+                          href="/exercises"
+                          className="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-stone-100"
+                        >
+                          Back to Exercises
+                        </Link>
+                        <Link
+                          href="/programs"
+                          className="rounded-md bg-beshaped-green px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                        >
+                          View Programs
+                        </Link>
+                      </div>
+
+                      {modalExerciseDetail?.embedUrl ? (
+                        <div className="border-t border-stone-200 pt-6">
+                          <h4 className="text-lg font-semibold text-zinc-900">Video tutorial</h4>
+                          <div className="mt-4 aspect-video w-full overflow-hidden rounded-xl border border-stone-200">
+                            <iframe
+                              src={modalExerciseDetail.embedUrl}
+                              title="Exercise video tutorial"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="h-full w-full"
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="shrink-0">
+                      <img
+                        src="/00321201-Barbell-Deadlift_Hips-FIX.gif"
+                        alt="Exercise demonstration"
+                        className="rounded-xl border border-stone-200 object-cover max-w-[280px] w-full"
+                      />
+                    </div>
                   </div>
-                  <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                      Target sets
-                    </p>
-                    <p className="mt-2 text-lg font-semibold text-zinc-900">
-                      {selectedExerciseInfo.targetSets}
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
