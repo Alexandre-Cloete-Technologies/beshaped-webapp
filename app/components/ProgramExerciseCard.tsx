@@ -4,7 +4,7 @@ import { FiInfo } from "react-icons/fi";
 export type ProgramExerciseCardData = {
   id: string;
   exerciseName: string;
-  muscleGroup: string;
+  musclesInvolved: string;
   targetReps: string;
   targetSets: number;
   description: string;
@@ -26,7 +26,7 @@ export const ProgramExerciseCard = ({
       <div className="flex items-center justify-between border-b border-stone-200 bg-stone-50 px-6 py-4">
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-beshaped-green px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-white">
-            {exercise.muscleGroup}
+            {exercise.musclesInvolved}
           </span>
 
         </div>

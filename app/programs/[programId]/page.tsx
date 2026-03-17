@@ -78,9 +78,10 @@ const toStringArray = (value: unknown) => {
   return singleValue ? [singleValue] : [];
 };
 
-const readMuscleGroup = (value: unknown) => {
+const readPrimaryMuscles = (value: unknown) => {
   if (Array.isArray(value)) {
-    return toStringArray(value)[0] ?? "General";
+    const items = toStringArray(value);
+    return items.length > 0 ? items.join(", ") : "General";
   }
 
   return readString(value) || "General";
@@ -98,7 +99,7 @@ const normalizeExercise = (value: unknown, index: number): ProgramExercise | nul
   return {
     id: readString(value.id, value.exerciseId) || `exercise-${index + 1}`,
     exerciseName,
-    muscleGroup: readMuscleGroup(value.muscleGroup ?? value.primaryMuscles),
+    musclesInvolved: readPrimaryMuscles(value.musclesInvolved),
     targetReps: readString(value.targetReps, value.reps, value.repsRange) || "8-12",
     targetSets,
     description: readString(value.description, value.notes),
@@ -524,7 +525,7 @@ export default function ProgramDetailPage() {
                     {selectedExerciseInfo.exerciseName}
                   </h2>
                   <p className="mt-1 text-sm text-zinc-500">
-                    Target muscle: {selectedExerciseInfo.muscleGroup}
+                    Target muscle: {selectedExerciseInfo.musclesInvolved}
                   </p>
                 </div>
                 <button
