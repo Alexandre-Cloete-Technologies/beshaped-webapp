@@ -181,7 +181,7 @@ const normalizePhase = (value: unknown, index: number): ProgramPhase | null => {
 
   return {
     phase: Math.max(1, readNumber(value.phase, value.phaseNumber, value.number, index + 1) || index + 1),
-    information: toStringArray(value.information ?? value.phaseInfo ?? value.notes),
+    information: toStringArray(value.description ?? value.information ?? value.phaseInfo ?? value.notes),
     workouts: workoutsSource
       .map((workout, workoutIndex) => normalizeWorkout(workout, workoutIndex))
       .filter((workout): workout is ProgramWorkout => workout !== null),
