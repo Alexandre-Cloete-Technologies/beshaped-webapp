@@ -11,6 +11,7 @@ import {
 } from "../../components/ProgramExerciseCard";
 import { ProtectedNavbar } from "../../components/ProtectedNavbar";
 import { db } from "../../../lib/firebase";
+import { resolveGifUrl } from "../../../lib/exercise-utils";
 
 type ProgramExercise = ProgramExerciseCardData;
 
@@ -254,6 +255,7 @@ export default function ProgramDetailPage() {
     primaryMuscles: string;
     secondaryMuscles: string[];
     embedUrl: string | null;
+    anatomyGifUrl: string | null;
   } | null>(null);
   const [modalExerciseLoading, setModalExerciseLoading] = useState(false);
 
@@ -274,16 +276,19 @@ export default function ProgramDetailPage() {
             primaryMuscles: selectedExerciseInfo.musclesInvolved,
             secondaryMuscles: ["N/A"],
             embedUrl: null,
+            anatomyGifUrl: null,
           });
           return;
         }
         const data = snapshot.data();
         const youtubeUrl = readYoutubeUrl(data as Record<string, unknown>);
+        const anatomyGifUrl = await resolveGifUrl(data.anatomyExerciseWalkthrough);
         setModalExerciseDetail({
           name: (typeof data.name === "string" && data.name.trim() ? data.name : selectedExerciseInfo.exerciseName) as string,
           primaryMuscles: readPrimaryMuscle(data.primaryMuscles),
           secondaryMuscles: readSecondaryMuscles(data.secondaryMuscles),
           embedUrl: youtubeUrl ? getYoutubeEmbedUrl(youtubeUrl) : null,
+          anatomyGifUrl,
         });
       } catch {
         setModalExerciseDetail({
@@ -291,6 +296,7 @@ export default function ProgramDetailPage() {
           primaryMuscles: selectedExerciseInfo.musclesInvolved,
           secondaryMuscles: ["N/A"],
           embedUrl: null,
+          anatomyGifUrl: null,
         });
       } finally {
         setModalExerciseLoading(false);
@@ -718,13 +724,15 @@ export default function ProgramDetailPage() {
                       ) : null}
                     </div>
 
-                    <div className="shrink-0">
-                      <img
-                        src="/00321201-Barbell-Deadlift_Hips-FIX.gif"
-                        alt="Exercise demonstration"
-                        className="rounded-xl border border-stone-200 object-cover max-w-[280px] w-full"
-                      />
-                    </div>
+                    {modalExerciseDetail?.anatomyGifUrl ? (
+                      <div className="shrink-0">
+                        <img
+                          src={modalExerciseDetail.anatomyGifUrl}
+                          alt="Exercise demonstration"
+                          className="rounded-xl border border-stone-200 object-cover max-w-[280px] w-full"
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 )}
               </div>

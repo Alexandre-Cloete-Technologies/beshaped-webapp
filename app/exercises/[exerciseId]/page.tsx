@@ -2,6 +2,7 @@ import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
 import { ProtectedNavbar } from "../../components/ProtectedNavbar";
 import { db } from "../../../lib/firebase";
+import { resolveGifUrl } from "../../../lib/exercise-utils";
 
 type ExerciseDetailPageProps = {
   params: Promise<{
@@ -68,6 +69,9 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
     ? readYoutubeUrl(docSnap.data() as Record<string, unknown>)
     : null;
   const embedUrl = youtubeUrl ? getYoutubeEmbedUrl(youtubeUrl) : null;
+  const anatomyGifUrl = docSnap.exists()
+    ? await resolveGifUrl(docSnap.data().anatomyExerciseWalkthrough)
+    : null;
 
   return (
     <div className="min-h-screen bg-stone-100">
@@ -123,13 +127,15 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
             ) : null}
               </div>
 
-              <div className="shrink-0">
-                <img
-                  src="/00321201-Barbell-Deadlift_Hips-FIX.gif"
-                  alt="Exercise demonstration"
-                  className="rounded-xl border border-stone-200 object-cover max-w-[280px] w-full"
-                />
-              </div>
+              {anatomyGifUrl ? (
+                <div className="shrink-0">
+                  <img
+                    src={anatomyGifUrl}
+                    alt="Exercise demonstration"
+                    className="rounded-xl border border-stone-200 object-cover max-w-[280px] w-full"
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
         </main>
