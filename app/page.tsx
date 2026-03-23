@@ -9,6 +9,7 @@ import {
   TbToolsKitchen2,
   TbTrendingUp,
 } from "react-icons/tb";
+import { Footer } from "./components/Footer";
 import { Hero } from "./components/Hero";
 import { MeetTheTrainer } from "./components/MeetTheTrainer";
 import { Navbar } from "./components/Navbar";
@@ -368,17 +369,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-zinc-950 border-t border-zinc-800 px-6 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 md:flex-row">
-          <nav className="flex gap-8 text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">
-            <a href="#programs" className="transition hover:text-white">Programs</a>
-            <a href="#faq" className="transition hover:text-white">FAQs</a>
-            <a href="#contact" className="transition hover:text-white">Contact</a>
-          </nav>
-          <p className="text-xs text-zinc-500">©2026 - bEshaped Fitness</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function DashboardPage() {
               Welcome, {username}
             </h1>
             <p className="mt-3 text-zinc-600">
-              This Members area is still under development.
+              This is the Dashboard.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
