@@ -1,10 +1,10 @@
 export const MeetTheTrainer = () => {
   return (
-    <section className="bg-white px-6 py-20">
-      <div className="mx-auto max-w-6xl">
+    <section className="bg-white px-6 py-24 border-b border-black">
+      <div className="mx-auto max-w-6xl ">
         <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.42fr)] md:items-stretch md:gap-12 lg:gap-16">
           <div>
-            <p className="text-3xl font-bold uppercase tracking-[0.3em] text-zinc-900">
+            <p className="text-3xl font-bold uppercase  text-zinc-900">
               Meet your trainer
             </p>
             <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-zinc-900 md:text-4xl">

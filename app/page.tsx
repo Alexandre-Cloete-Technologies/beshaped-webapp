@@ -9,7 +9,7 @@ import {
   TbToolsKitchen2,
   TbTrendingUp,
 } from "react-icons/tb";
-import { Banner } from "./components/Banner";
+import { Hero } from "./components/Hero";
 import { MeetTheTrainer } from "./components/MeetTheTrainer";
 import { Navbar } from "./components/Navbar";
 
@@ -62,19 +62,12 @@ const memberFeatures: {
 ];
 
 const transformationImageUrls = [
-  "https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop",
+  "/transformation_one.jpg",
+  "/transformation_two.jpg",
+  "/transformation_three.jpg",
+  "/transformation_four.jpg",
 ] as const;
 
-/** Four before/after cards; pairs reuse the same four source images until real pairs are added. */
-const transformationPairs: [string, string][] = [
-  [transformationImageUrls[0], transformationImageUrls[1]],
-  [transformationImageUrls[2], transformationImageUrls[3]],
-  [transformationImageUrls[0], transformationImageUrls[2]],
-  [transformationImageUrls[1], transformationImageUrls[3]],
-];
 
 const silverFeatures = [
   "Custom Training Program",
@@ -95,18 +88,18 @@ export default function Home() {
   return (
     <div className={`${spaceGrotesk.className} w-full bg-white text-zinc-900`}>
       <Navbar />
-      <Banner />
+      <Hero />
 
       {/* Meet your trainer */}
       <MeetTheTrainer />
 
       {/* How it works */}
-      <section id="how-it-works" className="bg-white px-6 py-16 md:py-20">
+      <section id="how-it-works" className="bg-white px-6 py-16 md:py-20 border-b border-black">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-2xl font-bold uppercase tracking-[0.08em] text-[#0a1a32] md:text-3xl lg:text-[2rem] lg:leading-tight">
             How it works
           </h2>
-          <div className="mt-12 grid gap-12 md:grid-cols-4 md:gap-10 lg:gap-14">
+          <div className="mt-12 md:mt-28 grid gap-12 md:grid-cols-4 md:gap-10 lg:gap-14">
             {[
               {
                 num: "01",
@@ -148,10 +141,10 @@ export default function Home() {
       {/* What you have as a member */}
       <section className="bg-white px-6 py-16 md:py-20">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-2xl font-bold uppercase tracking-[0.08em] text-zinc-900 md:text-3xl lg:text-[2rem] lg:leading-tight">
+          <h2 className="text-2xl font-bold uppercase text-zinc-900 md:text-3xl lg:text-[2rem] lg:leading-tight">
             What you have as a member
           </h2>
-          <div className="mt-10 grid grid-cols-1 gap-px border border-zinc-900 bg-zinc-900 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-20 grid grid-cols-1 gap-px border border-zinc-900 bg-zinc-900 sm:grid-cols-2 lg:grid-cols-3">
             {memberFeatures.map(({ id, Icon, title, desc }) => (
               <article key={id} className="bg-white p-8 text-left md:p-10">
                 <Icon
@@ -178,20 +171,15 @@ export default function Home() {
             Our transformations
           </h2>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {transformationPairs.map(([beforeSrc, afterSrc], i) => (
+            {transformationImageUrls.map((src, i) => (
               <article
-                key={i}
-                className="flex min-w-0 border border-black"
+                key={src}
+                className="min-w-0 overflow-hidden border border-black"
               >
                 <img
-                  src={beforeSrc}
-                  alt={`Transformation ${i + 1}, before`}
-                  className="h-52 w-1/2 min-w-0 object-cover sm:h-56 lg:h-64"
-                />
-                <img
-                  src={afterSrc}
-                  alt={`Transformation ${i + 1}, after`}
-                  className="h-52 w-1/2 min-w-0 object-cover sm:h-56 lg:h-64"
+                  src={src}
+                  alt={`Transformation ${i + 1}`}
+                  className="h-52 w-full object-cover sm:h-56 lg:h-64"
                 />
               </article>
             ))}
@@ -202,7 +190,7 @@ export default function Home() {
       {/* Become a member – pricing */}
       <section id="pricing" className="bg-white px-6 py-16 text-zinc-900 md:py-20">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-center text-2xl font-bold uppercase tracking-[0.08em] text-zinc-900 md:text-3xl lg:text-[2rem]">
+          <h2 className="text-center text-2xl font-bold uppercase text-zinc-900 md:text-3xl lg:text-[2rem]">
             Become a member
           </h2>
           <div className="mt-12 grid gap-8 lg:grid-cols-3 lg:items-stretch">
@@ -304,7 +292,7 @@ export default function Home() {
       {/* Workout programs */}
       <section id="programs" className="bg-white px-6 py-16 md:py-20">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-2xl font-bold uppercase tracking-[0.08em] text-[#0a1a32] md:text-3xl lg:text-[2rem] lg:leading-tight">
+          <h2 className="text-2xl font-bold uppercase  text-[#0a1a32] md:text-3xl lg:text-[2rem] lg:leading-tight">
             Workout programs
           </h2>
           <div className="mt-10 grid gap-8 md:grid-cols-3 md:items-stretch">
@@ -338,7 +326,7 @@ export default function Home() {
                     alt={program.title}
                     className="h-full w-full object-cover grayscale"
                   />
-                  <span className="absolute left-0 top-0 bg-[#00a62c] px-3 py-1.5 text-[10px] font-bold uppercase leading-none tracking-wider text-white md:text-xs">
+                  <span className="absolute left-0 top-0 m-4 bg-[#00a62c] px-3 py-1.5 text-[10px] font-bold uppercase leading-none tracking-wider text-white md:text-xs">
                     {program.weeks}
                   </span>
                 </div>

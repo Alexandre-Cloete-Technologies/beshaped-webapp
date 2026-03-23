@@ -35,7 +35,7 @@ export default function LoginPage() {
         <div className="mb-8 flex flex-col items-center gap-3">
           <div className="relative w-full max-w-[220px]">
             <Image
-              src={"/logo.jpg"}
+              src={"/logotwo.png"}
               alt="Company Logo"
               width={320}
               height={120}

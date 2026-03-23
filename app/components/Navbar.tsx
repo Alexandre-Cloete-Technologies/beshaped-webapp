@@ -17,7 +17,7 @@ export const Navbar = () => {
         </Link>
 
         {/* Centre nav links */}
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-14 md:flex">
           {[
             { label: "Start Now", href: "#start" },
             { label: "Programs", href: "#programs" },
