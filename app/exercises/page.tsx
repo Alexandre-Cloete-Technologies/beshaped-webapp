@@ -125,14 +125,14 @@ export default function ExercisesPage() {
                   <p className="text-xs text-zinc-500">Total Exercises</p>
                   <p className="text-lg font-bold text-zinc-900">{exercises.length}</p>
                 </div>
-                <div className="rounded-lg border border-stone-200 bg-white px-4 py-2">
+                {/* <div className="rounded-lg border border-stone-200 bg-white px-4 py-2">
                   <p className="text-xs text-zinc-500">Most Popular Focus</p>
                   <p className="text-lg font-bold text-zinc-900">Strength</p>
                 </div>
                 <div className="rounded-lg border border-stone-200 bg-white px-4 py-2">
                   <p className="text-xs text-zinc-500">Quick Sessions</p>
                   <p className="text-lg font-bold text-zinc-900">8-20 min</p>
-                </div>
+                </div> */}
               </div>
             </section>
 
@@ -146,7 +146,7 @@ export default function ExercisesPage() {
                       onClick={() => setSelectedCategory(category)}
                       className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
                         category === selectedCategory
-                          ? "bg-beshaped-green text-white"
+                          ? "bg-beshaped-dark-green text-white"
                           : "bg-white text-zinc-700 hover:bg-stone-100"
                       }`}
                     >

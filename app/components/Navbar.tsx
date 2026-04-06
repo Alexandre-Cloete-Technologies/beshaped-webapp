@@ -19,10 +19,10 @@ export const Navbar = () => {
         {/* Centre nav links */}
         <div className="hidden items-center gap-14 md:flex">
           {[
-            { label: "Start Now", href: "#start" },
-            { label: "Programs", href: "#programs" },
-            { label: "FAQ", href: "#faq" },
-            { label: "Contact", href: "#contact" },
+            { label: "Start Now", href: "/#start" },
+            { label: "Programs", href: "/#programs" },
+            { label: "FAQ", href: "/#faq" },
+            { label: "Contact", href: "/#contact" },
           ].map((item) => (
             <Link
               key={item.label}

@@ -107,7 +107,7 @@ export default function ProgramsPage() {
                     <p className="mt-2 text-zinc-600">{program.description}</p>
                     <Link
                       href={`/programs/${program.id}`}
-                      className="mt-4 inline-block rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                      className="mt-4 inline-block rounded-md bg-beshaped-dark-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-beshaped-green"
                     >
                       View Program
                     </Link>

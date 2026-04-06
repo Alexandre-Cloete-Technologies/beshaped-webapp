@@ -32,7 +32,7 @@ export const ExerciseCard = ({
 
       <Link
         href={`/exercises/${id}`}
-        className="mt-5 inline-flex items-center rounded-md bg-beshaped-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+        className="mt-5 inline-flex items-center rounded-md bg-beshaped-dark-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
       >
         View Exercise
       </Link>
