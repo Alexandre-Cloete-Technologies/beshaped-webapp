@@ -48,7 +48,7 @@ export const ProtectedNavbar = () => {
                 key={item.href}
                 href={item.href}
                 className={`text-sm font-medium transition ${
-                  isActive ? "text-emerald-700" : "text-zinc-700 hover:text-zinc-900"
+                  isActive ? "text-beshaped-dark-green" : "text-zinc-700 hover:text-zinc-900"
                 }`}
               >
                 {item.label}

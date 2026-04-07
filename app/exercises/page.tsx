@@ -109,11 +109,8 @@ export default function ExercisesPage() {
         <main className="px-6 py-10 ">
           <div className="mx-auto max-w-7xl space-y-8">
             <section className="rounded-2xl border border-stone-200 bg-gradient-to-r from-stone-50 to-emerald-50 p-8 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+              <h1 className="text-3xl font-bold text-zinc-900 md:text-4xl">
                 Exercise Library
-              </p>
-              <h1 className="mt-3 text-3xl font-bold text-zinc-900 md:text-4xl">
-                Build your training sessions faster
               </h1>
               <p className="mt-3 max-w-2xl text-zinc-600">
                 Browse exercises by focus and difficulty, then open any exercise

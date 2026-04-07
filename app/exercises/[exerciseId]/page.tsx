@@ -105,7 +105,7 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
               </Link>
               <Link
                 href="/programs"
-                className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+                className="rounded-md bg-beshaped-dark-green px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
               >
                 View Programs
               </Link>
