@@ -179,6 +179,8 @@ export default function Home() {
                   src={src}
                   alt={`Transformation ${i + 1}`}
                   className="h-52 w-full object-cover sm:h-56 lg:h-64"
+                  width={1000}
+                  height={1000}
                 />
               </article>
             ))}
@@ -324,6 +326,8 @@ export default function Home() {
                     src={program.img}
                     alt={program.title}
                     className="h-full w-full object-cover grayscale"
+                    width={1000}
+                    height={1000}
                   />
                   <span className="absolute left-0 top-0 m-4 bg-[#00a62c] px-3 py-1.5 text-[10px] font-bold uppercase leading-none tracking-wider text-white md:text-xs">
                     {program.weeks}

@@ -1,4 +1,4 @@
-import OptimizedImage from "./OptimizedImage";
+import Image from "next/image";
 
 export const Hero = () => {
   return (
@@ -34,10 +34,12 @@ export const Hero = () => {
 
         {/* Right: athlete image */}
         <div className="relative min-h-[50vh] flex-1 overflow-hidden md:min-h-0">
-          <OptimizedImage
+          <Image
             src="/hero_image.jpg"
             alt="Athlete"
             className="absolute inset-0 h-full w-full object-cover object-center"
+            width={1000}
+            height={1000}
           />
         </div>
       </div>

@@ -39,6 +39,8 @@ export const MeetTheTrainer = () => {
               src="/meet_your_trainer_image.jpg"
               alt="Dewald Swart"
               className="h-[min(72vw,22rem)] w-full object-cover object-top md:h-full md:min-h-0"
+              width={1000}
+              height={1000}
             />
           </div>
         </div>
