@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # The Firebase private key is used server-side only (Server Actions & Server Components).
+  # Netlify's secrets scanner flags it in the serverless function bundles, which is a
+  # false positive. This tells the scanner to skip that specific key.
+  SECRETS_SCAN_OMIT_KEYS = "FIREBASE_PRIVATE_KEY"
