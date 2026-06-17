@@ -3,7 +3,7 @@
   publish = ".next"
 
 [build.environment]
-  # The Firebase private key is used server-side only (Server Actions & Server Components).
-  # Netlify's secrets scanner flags it in the serverless function bundles, which is a
-  # false positive. This tells the scanner to skip that specific key.
-  SECRETS_SCAN_OMIT_KEYS = "FIREBASE_PRIVATE_KEY"
+  # Firebase private key is server-only (Server Actions & Server Components).
+  # NEXT_PUBLIC_FIREBASE_* values are standard Firebase client config that is
+  # intentionally embedded in client bundles — these are not secret.
+  SECRETS_SCAN_OMIT_KEYS = "FIREBASE_PRIVATE_KEY,FIREBASE_CLIENT_EMAIL,FIREBASE_PROJECT_ID,NEXT_PUBLIC_FIREBASE_API_KEY,NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,NEXT_PUBLIC_FIREBASE_PROJECT_ID,NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,NEXT_PUBLIC_FIREBASE_APP_ID,NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID"
