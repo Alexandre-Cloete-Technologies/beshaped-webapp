@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Image, { ImageProps } from 'next/image'
 
-// Extend standard Next.js ImageProps so it accepts all default props
 interface OptimizedImageProps extends ImageProps {
     containerClassName?: string
 }
