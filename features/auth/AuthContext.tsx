@@ -11,16 +11,19 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import type { ProfileData, AuthContextType } from "./types/authTypes";
 import { useRouter } from "next/navigation";
 import { createSession, deleteSession } from "./api/actions";
-import { getUserProfile } from "./api/getUserProfile";
+import { subscribeToUserProfile } from "./api/subscribeToUserProfile";
 
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<Error | null>(null);
-  const [user, setUser] = useState<ProfileData | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [authUser, loading] = useAuthState(auth);
   const router = useRouter();
+  const uid = authUser?.uid;
+  // Only the signed-in user's own profile; null while signed out or before the doc exists.
+  const user = profile && profile.uid === uid ? profile : null;
 
   useEffect(() => {
     const syncSession = async () => {
@@ -28,23 +31,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
           const token = await authUser.getIdToken();
           await createSession(token);
-
-          const profileData = await getUserProfile(authUser.uid);
-          setUser(profileData);
-
           router.refresh();
         } catch (err) {
           console.error("Failed to sync session:", err);
         }
       } else {
         await deleteSession();
-        setUser(null);
         router.refresh();
       }
     }
 
     if (!loading) syncSession();
   }, [authUser, loading, router]);
+
+  useEffect(() => {
+    if (!uid) return;
+    // Sign-out can end the listener with a permission error before cleanup runs; show no profile then.
+    return subscribeToUserProfile(uid, setProfile, () => setProfile(null));
+  }, [uid]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -65,7 +69,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
-      setUser(null);
     } catch (error) {
       setError(error as Error);
     }
