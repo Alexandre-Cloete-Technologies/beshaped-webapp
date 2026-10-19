@@ -7,15 +7,15 @@ export interface AuthContextType {
   signOut: () => Promise<void>;
 };
 
-//firebase user collection
+//firebase user collection (users data contract in Notion)
 export interface ProfileData {
     uid: string;
-    displayName: string;
-    email: string;
-    age: number;
-    gender: string;
-    height: number;
-    weight: number;
+    displayName: string | null;
+    email: string | null;
+    age?: number;
+    gender?: string;
+    height?: number;
+    weight?: number;
     role: UserRoles;
 }
 //firebase auth user

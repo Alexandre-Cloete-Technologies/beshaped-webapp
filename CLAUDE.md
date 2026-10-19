@@ -24,8 +24,9 @@ subset of the mobile app. Workspace context and cross-repo rules: ../CLAUDE.md (
 - `middleware.ts`: redirects to `/login` when there is no `session` cookie (presence only, not verified)
 - `features/<area>/{api,types,components,hooks}`: auth, programs, exercises, products. Firestore reads live in
   `features/*/api/*.ts`, types in `features/*/types/*.ts`
-- `features/auth/`: `AuthContext` (client sign-in → `createSession` server action → Admin session cookie),
-  `getServerAuth.requireAuth()`, `AuthGuard`
+- `features/auth/`: `AuthContext` (client sign-in → `createSession` server action → Admin session cookie; the
+  profile comes from a `users/{uid}` listener, `subscribeToUserProfile`, because the doc is created server-side
+  a few seconds after sign-up), `getServerAuth.requireAuth()`, `AuthGuard`
 - `components/`: marketing sections and navbars · `lib/`: Firebase init, admin, exercise media helper
 
 ## Conventions
