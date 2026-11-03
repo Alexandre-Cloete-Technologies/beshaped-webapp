@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import {
     calculateAvailableWeeks,
-    calculateOverallDay,
-    findWorkoutByDay,
+    findWorkoutByWeekDay,
     validateWorkoutSelection,
 } from "../utils/workoutSelection.utils";
 import { ProgramPhase } from "../types/programTypes";
@@ -14,39 +13,43 @@ type UseProgramSelectionProps = {
 };
 
 /**
- * Custom hook for managing program selection state
- * Handles phase, week, and day selection with validation
+ * Manages phase / week / day selection for the program viewer.
+ *
+ * A program day is (phaseOrder, weekNumber, dayNumber) where weekNumber is
+ * 1…durationWeeks restarting each phase, and dayNumber is 1–7 restarting
+ * each week — matching how the coach portal writes and the mobile app reads.
  */
 export function useProgramSelection({ phases }: UseProgramSelectionProps) {
-    const [selectedPhase, setSelectedPhase] = useState(phases[0]?.order ?? 0);
+    const [selectedPhaseOrder, setSelectedPhaseOrder] = useState(phases[0]?.order ?? 0);
     const [selectedWeek, setSelectedWeek] = useState(1);
     const [selectedDayInWeek, setSelectedDayInWeek] = useState(1);
 
-    // Get current phase data
-    const selectedPhaseData = phases.find((p) => p.order === selectedPhase) || phases[0];
+    // Resolve current phase data.
+    const selectedPhaseData =
+        phases.find((p) => p.order === selectedPhaseOrder) ?? phases[0];
+
     const availableWeeks = selectedPhaseData
-        ? calculateAvailableWeeks(selectedPhaseData.workouts)
+        ? calculateAvailableWeeks(selectedPhaseData)
         : [];
 
-    // Calculate overall day
-    const selectedOverallDay = calculateOverallDay(selectedWeek, selectedDayInWeek);
-
-    // Get current workout
+    // Resolve the workout for the current selection.
     const selectedWorkout = selectedPhaseData
-        ? findWorkoutByDay(selectedPhaseData.workouts, selectedOverallDay)
+        ? findWorkoutByWeekDay(
+              selectedPhaseData.workouts,
+              selectedWeek,
+              selectedDayInWeek
+          )
         : undefined;
 
-    // Validate selection when phase changes
+    // When the phase changes, snap week/day back to a valid position.
     useEffect(() => {
         if (!selectedPhaseData) return;
-
         const validated = validateWorkoutSelection(
             phases,
-            selectedPhase,
+            selectedPhaseOrder,
             selectedWeek,
             selectedDayInWeek
         );
-
         if (
             validated.week !== selectedWeek ||
             validated.dayInWeek !== selectedDayInWeek
@@ -54,10 +57,11 @@ export function useProgramSelection({ phases }: UseProgramSelectionProps) {
             setSelectedWeek(validated.week);
             setSelectedDayInWeek(validated.dayInWeek);
         }
-    }, [selectedPhase, phases]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedPhaseOrder, phases]);
 
-    const handlePhaseChange = (phase: number) => {
-        setSelectedPhase(phase);
+    const handlePhaseChange = (phaseOrder: number) => {
+        setSelectedPhaseOrder(phaseOrder);
         setSelectedWeek(1);
         setSelectedDayInWeek(1);
     };
@@ -72,10 +76,9 @@ export function useProgramSelection({ phases }: UseProgramSelectionProps) {
     };
 
     return {
-        selectedPhase,
+        selectedPhase: selectedPhaseOrder,
         selectedWeek,
         selectedDayInWeek,
-        selectedOverallDay,
         selectedPhaseData,
         selectedWorkout,
         availableWeeks,

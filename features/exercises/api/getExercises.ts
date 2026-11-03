@@ -22,7 +22,11 @@ export const getExerciseById = async (programId: string): Promise<Exercise> => {
             throw new Error("Program not found");
         }
 
-        return { ...docSnap.data(), updatedAt: docSnap.data().updatedAt.toDate().toISOString() } as Exercise;
+        const data = docSnap.data();
+        return {
+            ...data,
+            updatedAt: data.updatedAt?.toDate().toISOString(),
+        } as Exercise;
     } catch {
         throw new Error("Failed to fetch exercise.");
     }

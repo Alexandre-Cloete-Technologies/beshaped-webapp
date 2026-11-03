@@ -6,7 +6,8 @@ import { ProgramExercise } from "../types/programTypes";
 type ExerciseListProps = {
     exercises: ProgramExercise[];
     selectedPhase: number;
-    selectedOverallDay: number;
+    selectedWeek: number;
+    selectedDayInWeek: number;
     onViewDetails: (exerciseId: string) => void;
 };
 
@@ -14,7 +15,8 @@ type ExerciseListProps = {
 export function ExerciseList({
     exercises,
     selectedPhase,
-    selectedOverallDay,
+    selectedWeek,
+    selectedDayInWeek,
     onViewDetails,
 }: ExerciseListProps) {
     if (!exercises || exercises.length === 0) {
@@ -28,7 +30,7 @@ export function ExerciseList({
     return (
         <>
             {exercises.map((exercise, exerciseIndex) => {
-                const exerciseKey = `${selectedPhase}-${selectedOverallDay}-${exerciseIndex}-${exercise.exerciseId}`;
+                const exerciseKey = `${selectedPhase}-w${selectedWeek}d${selectedDayInWeek}-${exerciseIndex}-${exercise.exerciseId}`;
 
                 return (
                     <ProgramExerciseCard

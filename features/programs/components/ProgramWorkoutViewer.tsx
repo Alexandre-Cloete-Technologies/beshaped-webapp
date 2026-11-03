@@ -22,7 +22,6 @@ export function ProgramWorkoutViewer({ program }: ProgramWorkoutViewerProps) {
         selectedPhase,
         selectedWeek,
         selectedDayInWeek,
-        selectedOverallDay,
         selectedPhaseData,
         selectedWorkout,
         availableWeeks,
@@ -54,7 +53,6 @@ export function ProgramWorkoutViewer({ program }: ProgramWorkoutViewerProps) {
             <section className="space-y-5">
                 <h2 className="text-xl font-semibold text-zinc-900">Select workout</h2>
 
-
                 {/* Selection Controls */}
                 <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
                     <div className="space-y-6">
@@ -65,20 +63,19 @@ export function ProgramWorkoutViewer({ program }: ProgramWorkoutViewerProps) {
                         />
 
                         {availableWeeks.length > 1 && (
-                            <div className="space-y-6">
-                                <WeekSelector
-                                    availableWeeks={availableWeeks}
-                                    selectedWeek={selectedWeek}
-                                    onWeekChange={handleWeekChange}
-                                />
-                                <DaySelector
-                                    selectedWeek={selectedWeek}
-                                    selectedDayInWeek={selectedDayInWeek}
-                                    workouts={selectedPhaseData.workouts}
-                                    onDayChange={handleDayChange}
-                                />
-                            </div>
+                            <WeekSelector
+                                availableWeeks={availableWeeks}
+                                selectedWeek={selectedWeek}
+                                onWeekChange={handleWeekChange}
+                            />
                         )}
+
+                        <DaySelector
+                            selectedWeek={selectedWeek}
+                            selectedDayInWeek={selectedDayInWeek}
+                            workouts={selectedPhaseData.workouts}
+                            onDayChange={handleDayChange}
+                        />
                     </div>
                 </div>
                 <PhaseInfo
@@ -101,7 +98,8 @@ export function ProgramWorkoutViewer({ program }: ProgramWorkoutViewerProps) {
                     <ExerciseList
                         exercises={selectedWorkout.exercises}
                         selectedPhase={selectedPhase}
-                        selectedOverallDay={selectedOverallDay}
+                        selectedWeek={selectedWeek}
+                        selectedDayInWeek={selectedDayInWeek}
                         onViewDetails={openModal}
                     />
                 </section>

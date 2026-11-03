@@ -1,101 +1,108 @@
 import { ProgramPhase, Workout } from "../types/programTypes";
 
-/**
- * Calculates available weeks for a phase based on workouts
- */
-export const calculateAvailableWeeks = (workouts: Workout[]): number[] => {
-  if (!workouts || workouts.length === 0) return [];
-
-  const maxDay = Math.max(...workouts.map((w) => w.dayNumber));
-  const weekCount = Math.ceil(maxDay / 7);
-
-  return Array.from({ length: weekCount }, (_, i) => i + 1);
-};
+const DAYS_PER_WEEK = 7;
 
 /**
- * Converts week and day-in-week to overall day number
+ * Normalises a workout's week and day numbers.
+ *
+ * The coach portal writes `weekNumber` (1…durationWeeks) and `dayNumber` (1–7).
+ * Older data may have `dayNumber` counting across the whole phase (> 7) with no
+ * `weekNumber`; this fallback splits it the same way the mobile app does
+ * (fitness/lib/program-days.ts `readWeekAndDay`).
  */
-export const calculateOverallDay = (week: number, dayInWeek: number): number => {
-  return (week - 1) * 7 + dayInWeek;
-};
-
-/**
- * Finds a workout for a specific day
- */
-export const findWorkoutByDay = (
-  workouts: Workout[],
-  day: number
-): Workout | undefined => {
-  return workouts.find((workout) => workout.dayNumber === day);
-};
-
-/**
- * Checks if a phase has workouts for a specific week
- */
-export const hasWorkoutsInWeek = (
-  workouts: Workout[],
-  week: number
-): boolean => {
-  const startDay = (week - 1) * 7 + 1;
-  const endDay = week * 7;
-
-  return workouts.some((w) => w.dayNumber >= startDay && w.dayNumber <= endDay);
-};
-
-/**
- * Gets the first available day in a week
- */
-export const getFirstAvailableDayInWeek = (
-  workouts: Workout[],
-  week: number
-): number => {
-  const startDay = (week - 1) * 7 + 1;
-  const endDay = week * 7;
-
-  for (let dayInWeek = 1; dayInWeek <= 7; dayInWeek++) {
-    const overallDay = startDay + dayInWeek - 1;
-    if (workouts.some((w) => w.dayNumber === overallDay)) {
-      return dayInWeek;
-    }
+function normaliseWeekDay(workout: Workout): { weekNumber: number; dayNumber: number } {
+  const day = workout.dayNumber;
+  if (day > DAYS_PER_WEEK) {
+    // Legacy: overall phase day — split into week + day-in-week.
+    return {
+      weekNumber: Math.ceil(day / DAYS_PER_WEEK),
+      dayNumber: ((day - 1) % DAYS_PER_WEEK) + 1,
+    };
   }
+  return {
+    weekNumber: workout.weekNumber ?? 1,
+    dayNumber: day,
+  };
+}
 
+/**
+ * Number of weeks in a phase.
+ * Prefer the authoritative `durationWeeks` field; fall back to inferring from
+ * the highest weekNumber seen in the workouts (handles legacy data).
+ */
+export const getWeekCount = (phase: ProgramPhase): number => {
+  if (phase.durationWeeks && phase.durationWeeks > 0) return phase.durationWeeks;
+  if (!phase.workouts || phase.workouts.length === 0) return 1;
+  return Math.max(...phase.workouts.map((w) => normaliseWeekDay(w).weekNumber));
+};
+
+/**
+ * Available week numbers for a phase (1…weekCount).
+ */
+export const calculateAvailableWeeks = (phase: ProgramPhase): number[] => {
+  const count = getWeekCount(phase);
+  return Array.from({ length: count }, (_, i) => i + 1);
+};
+
+/**
+ * Returns true when a workout exists for the given weekNumber + dayNumber pair.
+ */
+export const hasWorkoutAt = (
+  workouts: Workout[],
+  weekNumber: number,
+  dayNumber: number
+): boolean =>
+  workouts.some((w) => {
+    const n = normaliseWeekDay(w);
+    return n.weekNumber === weekNumber && n.dayNumber === dayNumber;
+  });
+
+/**
+ * Finds the workout for a specific (weekNumber, dayNumber).
+ */
+export const findWorkoutByWeekDay = (
+  workouts: Workout[],
+  weekNumber: number,
+  dayNumber: number
+): Workout | undefined =>
+  workouts.find((w) => {
+    const n = normaliseWeekDay(w);
+    return n.weekNumber === weekNumber && n.dayNumber === dayNumber;
+  });
+
+/**
+ * Returns the first day-in-week (1–7) that has a workout in the given week,
+ * or 1 if none exist (rest-day week).
+ */
+export const getFirstDayInWeek = (workouts: Workout[], weekNumber: number): number => {
+  for (let d = 1; d <= DAYS_PER_WEEK; d++) {
+    if (hasWorkoutAt(workouts, weekNumber, d)) return d;
+  }
   return 1;
 };
 
 /**
- * Validates and adjusts workout selection to ensure it points to valid data
+ * Validates and adjusts the current selection so it always points at an
+ * existing workout (or the nearest valid position when it doesn't).
  */
 export const validateWorkoutSelection = (
   phases: ProgramPhase[],
-  currentPhase: number,
+  currentPhaseOrder: number,
   currentWeek: number,
   currentDayInWeek: number
-): { phase: number; week: number; dayInWeek: number; overallDay: number } => {
-  const phase = phases.find((p) => p.order === currentPhase) || phases[0];
-  if (!phase) {
-    return { phase: 1, week: 1, dayInWeek: 1, overallDay: 1 };
-  }
+): { phaseOrder: number; week: number; dayInWeek: number } => {
+  const phase =
+    phases.find((p) => p.order === currentPhaseOrder) ?? phases[0];
+  if (!phase) return { phaseOrder: 0, week: 1, dayInWeek: 1 };
 
-  const availableWeeks = calculateAvailableWeeks(phase.workouts);
-  const week = availableWeeks.includes(currentWeek) ? currentWeek : availableWeeks[0] || 1;
-  
-  const overallDay = calculateOverallDay(week, currentDayInWeek);
-  const workout = findWorkoutByDay(phase.workouts, overallDay);
+  const weekCount = getWeekCount(phase);
+  const week =
+    currentWeek >= 1 && currentWeek <= weekCount ? currentWeek : 1;
 
-  if (!workout) {
-    const firstDay = getFirstAvailableDayInWeek(phase.workouts, week);
-    return {
-      phase: phase.order,
-      week,
-      dayInWeek: firstDay,
-      overallDay: calculateOverallDay(week, firstDay),
-    };
-  }
+  const dayExists = hasWorkoutAt(phase.workouts, week, currentDayInWeek);
+  const dayInWeek = dayExists
+    ? currentDayInWeek
+    : getFirstDayInWeek(phase.workouts, week);
 
-  return {
-    phase: phase.order,
-    week,
-    dayInWeek: currentDayInWeek,
-    overallDay,
-  };
+  return { phaseOrder: phase.order, week, dayInWeek };
 };

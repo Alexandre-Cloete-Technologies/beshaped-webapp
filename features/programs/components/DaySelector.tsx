@@ -1,13 +1,14 @@
 "use client";
 
 import type { Workout } from "../types/programTypes";
+import { hasWorkoutAt } from "../utils/workoutSelection.utils";
 
 interface DaySelectorProps {
     selectedWeek: number;
     selectedDayInWeek: number;
     workouts: Workout[];
     onDayChange: (dayInWeek: number) => void;
-};
+}
 
 
 export function DaySelector({
@@ -23,8 +24,7 @@ export function DaySelector({
             </p>
             <div className="flex flex-wrap gap-2">
                 {[1, 2, 3, 4, 5, 6, 7].map((dayInWeek) => {
-                    const overallDay = (selectedWeek - 1) * 7 + dayInWeek;
-                    const hasWorkout = workouts.some((w) => w.dayNumber === overallDay);
+                    const hasWorkout = hasWorkoutAt(workouts, selectedWeek, dayInWeek);
 
                     return (
                         <button
