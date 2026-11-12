@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FiX } from "react-icons/fi";
 import OptimizedImage from "@/components/OptimizedImage";
 import { Exercise } from "@/features/exercises/types/exerciseTypes";
@@ -67,6 +68,12 @@ export function ExerciseDetailModal({
                                             {exerciseDetail?.secondaryMuscles?.join(", ") ?? "N/A"}
                                         </p>
                                     </div>
+                                    <Link
+                                        href={`/exercises/${selectedExerciseId}`}
+                                        className="mt-4 inline-flex min-h-11 items-center rounded-md border border-stone-300 px-4 text-sm font-medium text-zinc-700 transition hover:bg-stone-100"
+                                    >
+                                        History and progress
+                                    </Link>
                                 </div>
                             </div>
 
