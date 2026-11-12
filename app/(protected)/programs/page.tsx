@@ -1,13 +1,13 @@
-
-import { getAllPrograms } from "@/features/programs/api/getPrograms";
+import { requireAuth } from "@/features/auth/api/getServerAuth";
+import { getProgramsForUser } from "@/features/programs/api/getPrograms";
 import { ListErrorFallback } from "@/components/ListErrorFallback";
 import ProgramsList from "@/features/programs/components/ProgramsList";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
-export default function ProgramsPage() {
-  const programsPromise = getAllPrograms();
-
+export default async function ProgramsPage() {
+  const { uid } = await requireAuth();
+  const programsPromise = getProgramsForUser(uid);
 
   return (
     <div className="min-h-screen bg-stone-100">
