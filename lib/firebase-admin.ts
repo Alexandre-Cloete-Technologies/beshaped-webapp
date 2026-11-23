@@ -1,6 +1,7 @@
 import "server-only";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 
 if (!getApps().length) {
   initializeApp({
@@ -13,3 +14,9 @@ if (!getApps().length) {
 }
 
 export const adminAuth = getAuth();
+
+/**
+ * Firestore with the service account: it bypasses security rules, so use it only after `requireAuth()` and
+ * only to read the signed-in user's own data (e.g. their entitlements).
+ */
+export const adminDb = getFirestore();

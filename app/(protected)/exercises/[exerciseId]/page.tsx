@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { requireAuth } from "@/features/auth/api/getServerAuth";
 import { getExerciseById } from "@/features/exercises/api/getExercises";
 import OptimizedImage from "@/components/OptimizedImage";
+import { ExerciseProgress } from "@/features/exercises/components/ExerciseProgress";
 
 interface ExerciseDetailPageProps {
   params: Promise<{
@@ -25,6 +27,7 @@ const getYoutubeEmbedUrl = (url: string): string => {
 };
 
 export default async function ExerciseDetailPage({ params }: ExerciseDetailPageProps) {
+  await requireAuth();
   const { exerciseId } = await params;
 
   const exercise = await getExerciseById(exerciseId);
@@ -37,7 +40,8 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
   return (
     <div className="min-h-screen bg-stone-100">
       <main className="px-6 py-10">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-stone-200 bg-stone-50 p-8 shadow-sm">
+        <div className="mx-auto max-w-4xl space-y-6">
+        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-8 shadow-sm">
 
           <div className="flex-1 min-w-0">
 
@@ -199,6 +203,9 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
             </div>
 
           </div>
+        </div>
+
+        <ExerciseProgress exerciseId={exerciseId} exerciseName={exercise.name} />
         </div>
       </main>
     </div>

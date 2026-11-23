@@ -1,7 +1,7 @@
-import { Exercise } from "@/features/exercises/types/exerciseTypes";
-
 export interface Program {
     id: string;
+    /** "free" programs are open to every member; others need an entry in `users.availablePrograms`. */
+    accessType?: string | null;
     assignedTo: string;
     coverImage: string;
     createdAt: string;
@@ -47,7 +47,3 @@ export interface ProgramExercise {
 }
 
 export type ProgramListItem = Pick<Program, "id" | "name" | "description" | "createdAt" >;
-
-
-
-

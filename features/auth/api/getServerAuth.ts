@@ -19,11 +19,17 @@ async function getServerAuth() {
   }
 }
 
+/**
+ * The verified session of the signed-in user; redirects to the login page when there is none. Every protected
+ * page calls this: the middleware only checks that a cookie is present.
+ */
 export async function requireAuth() {
   const auth = await getServerAuth();
-  
+
   if (!auth) {
-    redirect("/login");
+    // A cookie that is present but expired or revoked can't be deleted from a page render, and the middleware
+    // sends any request with a cookie away from /login. `session=expired` tells it to clear the cookie first.
+    redirect("/login?session=expired");
   }
   
   return auth;
